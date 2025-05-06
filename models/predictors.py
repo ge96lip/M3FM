@@ -194,7 +194,11 @@ class MTHead(nn.Module):
                                                             reduction='sum') / label_mask_norm
                 loss_weight = self.get_loss_weight(k, loss_k.item(), loss_weight)
                 loss_all = loss_all + loss_k * loss_weight
-
+            elif k == 'cancer_presence':
+                targets = targets.reshape([targets.shape[0] * num_head, targets.shape[2]])
+                loss_k = F.binary_cross_entropy_with_logits(task_logit, targets)
+                loss_weight = self.get_loss_weight(k, loss_k.item(), loss_weight)
+                loss_all = loss_all + loss_k * loss_weight
             elif k == 'clinical_number':
                 task_logit = task_logit.reshape(task_logit.shape[0], 10, -1)
                 targets = targets.reshape([targets.shape[0] * num_head, targets.shape[2]])
